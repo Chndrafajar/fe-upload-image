@@ -1,10 +1,10 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAuth } from "../context/authContext";
 import { toast } from "react-toastify";
+import axiosInstance from "../config/axiosInstance";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -19,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/api/v1/user/login", { username, password });
+      const res = await axiosInstance.post("/api/v1/user/login", { username, password });
       if (res && res.data.success) {
         toast.success(res.data.message);
         setAuth({

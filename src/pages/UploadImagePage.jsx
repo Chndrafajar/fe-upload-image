@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Card, Spinner } from "react-bootstrap";
 import styled from "styled-components";
 import { LuCopy } from "react-icons/lu";
-import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../config/axiosInstance";
 
 export default function UploadImagePage() {
   const [imageUrl, setImageUrl] = useState("");
@@ -17,7 +17,7 @@ export default function UploadImagePage() {
 
       setLoading(true);
       try {
-        const response = await axios.post("/api/v1/images/upload", formData, {
+        const response = await axiosInstance.post("/api/v1/images/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
