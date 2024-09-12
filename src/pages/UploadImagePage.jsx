@@ -1,22 +1,79 @@
-import React from "react";
-import { Card } from "react-bootstrap";
+import React, { useState } from "react";
+import { Card, Spinner } from "react-bootstrap";
 import styled from "styled-components";
 import { LuCopy } from "react-icons/lu";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function UploadImagePage() {
+  const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      setLoading(true);
+      try {
+        const response = await axios.post("/api/v1/images/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.data && response.data.image && response.data.image.id) {
+          const imageId = response.data.image.id;
+          setImageUrl(`https://upload-image-be.vercel.app/api/v1/images/${imageId}`);
+          toast.success(response.data.message);
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(imageUrl)
+      .then(() => alert("URL copied to clipboard!"))
+      .catch((err) => console.error("Failed to copy URL:", err));
+  };
+
   return (
     <BackWrapper>
       <CardUpload>
+        <img src="/images/icons-image.png" alt="" width="60px" />
         <h4 style={{ marginBottom: "0" }}>Upload Image</h4>
-        <input type="file" />
+        <input type="file" onChange={handleFileChange} />
       </CardUpload>
+
       <CardCopyLinkImage>
-        <div>
-          <b>Link Image: </b> <span className="ms-2">http://localhost:3000/upload</span>
-        </div>
-        <ButtonCopy>
-          <LuCopy />
-        </ButtonCopy>
+        {loading ? (
+          <Spinner animation="border" variant="primary" />
+        ) : (
+          <>
+            {imageUrl ? (
+              <>
+                <div>
+                  <b>Link Image: </b> <span className="ms-2">{imageUrl}</span>
+                </div>
+                <ButtonCopy onClick={copyToClipboard}>
+                  <LuCopy />
+                </ButtonCopy>
+              </>
+            ) : (
+              <div style={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+                <img src="/images/icons-image.png" alt="" width="60px" />
+                <h4 className="mt-2">Link Images Disini</h4>
+              </div>
+            )}
+          </>
+        )}
       </CardCopyLinkImage>
     </BackWrapper>
   );
