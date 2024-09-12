@@ -25,7 +25,7 @@ export default function UploadImagePage() {
 
         if (response.data && response.data.image && response.data.image.id) {
           const imageId = response.data.image.id;
-          setImageUrl(`https://upload-image-be.vercel.app/api/v1/images/${imageId}`);
+          setImageUrl(`${process.env.REACT_APP_API_URL}${imageId}`);
           toast.success(response.data.message);
         }
       } catch (error) {
